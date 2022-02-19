@@ -9,11 +9,17 @@ contract Playmo is Ownable{
     uint256 public maxTopPlayers;
     uint256 public maxPlays;
     mapping (address => Player) players;
+    mapping (uint256 => Player) topPlayers;
+    uint256 internal topPlayersCount;
 
     struct Player {
         uint256 numTrials;
         uint256 equityWeight;
         uint256 highScore;
+    }
+
+    function addTopPlayer(address playerAddress) internal view {
+
     }
 
     function updateScore(address playerAddress, uint256 score)
