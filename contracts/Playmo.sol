@@ -14,7 +14,7 @@ contract Playmo is Ownable{
 
     struct Player {
         uint256 numTrials;
-        uint256 equityWeight;
+        uint256 shares;
         uint256 highScore;
     }
 
@@ -22,8 +22,20 @@ contract Playmo is Ownable{
 
     }
 
-    function updateScore(address playerAddress, uint256 score)
+    function updateScore(address playerAddress, uint256 score, uint256 numTrials)
         public onlyOwner {
+            uint256 currRanking = -1;
+            for (uint256 i = topPlayersCount - 1; i >= 0 ; i--) {
+                if (score < topPlayers[i].highScore) {
+                    break;
+                }else if (score > topPlayers[i].highScore){
+                    currRanking = i;
+                }
+            }
 
+            if (currRanking < 0) { return; }
+
+            uint256 shares = (maxTopPlayers*10) - 10 * currRanking;
+            topPlayers[currRanking] = Player(numTrials, shares, score);
     }
 }
