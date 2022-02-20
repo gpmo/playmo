@@ -8,8 +8,8 @@ contract Playmo is Ownable {
     uint256 public playCost;
     uint256 public maxTopPlayers;
     uint256 public maxPlays;
-    mapping(address => Player) players;
-    mapping(uint256 => Player) topPlayers;
+    mapping(address => Player) public players;
+    mapping(uint256 => Player) public topPlayers;
     uint256 internal topPlayersCount;
 
     // share weights
@@ -23,7 +23,9 @@ contract Playmo is Ownable {
         bool exists;
     }
 
-    function addTopPlayer(address playerAddress) internal view {}
+    constructor() {
+        maxTopPlayers = 3;
+    }
 
     function updateScore(address playerAddress, uint256 newScore)
         public
@@ -44,9 +46,26 @@ contract Playmo is Ownable {
             players[playerAddress] = playerWithNewScore;
         }
 
+        if (topPlayersCount == 0) {
+            topPlayers[0] = playerWithNewScore;
+            topPlayersCount++;
+            return;
+        }
+
+        console.log("Player with new score");
+        logPlayer(playerWithNewScore);
+        console.log("*********************");
+
+        // uint256 newPlayersCount = topPlayersCount;
         // update top players array if necessary
         Player memory unswappedPlayer;
         for (uint256 i = 0; i < topPlayersCount; i++) {
+            console.log("Current top player - position %s", i);
+            logPlayer(topPlayers[i]);
+            console.log("Unswapped player");
+            logPlayer(unswappedPlayer);
+            console.log("============");
+
             // if playerScore is larger than score for player i
             if (newScore > topPlayers[i].score) {
                 // if newScore does not belong to the player i
@@ -54,11 +73,23 @@ contract Playmo is Ownable {
                     unswappedPlayer = topPlayers[i];
                     Player memory player;
                     topPlayers[i] = player;
+                    if (topPlayersCount < maxTopPlayers) {
+                        topPlayersCount++;
+                    }
                     // if newScore belongs to the player i
                 } else {
                     topPlayers[i].score = newScore;
+                    break;
                 }
-            } else {}
+            } else if (unswappedPlayer.exists) {
+                Player memory currentPlayer = topPlayers[i];
+                topPlayers[i] = unswappedPlayer;
+                unswappedPlayer = currentPlayer;
+            }
         }
+    }
+
+    function logPlayer(Player memory player) internal {
+        console.log("Player {address: %s, score: %s, exists: %s}", player.playerAddress, player.score, player.exists);
     }
 }

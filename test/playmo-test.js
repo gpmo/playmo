@@ -9,12 +9,19 @@ describe('Playmo', function () {
 
     const accounts = await hre.ethers.getSigners();
 
-    await playmo.updateScore(accounts[0], 100);
-    await playmo.updateScore(accounts[1], 100);
-    await playmo.updateScore(accounts[2], 100);
-    await playmo.updateScore(accounts[3], 100);
+    let tx = await playmo.updateScore(accounts[0].address, 100);
+    // wait until the transaction is mined
+    await tx.wait();
+    tx = await playmo.updateScore(accounts[1].address, 200);
+    await tx.wait();
+    tx = await playmo.updateScore(accounts[2].address, 300);
+    await tx.wait();
+    tx = await playmo.updateScore(accounts[3].address, 400);
 
-    console.log(playmo.topPlayers);
+    for (var i = 0; i < 4; i++) {
+      const player = await playmo.topPlayers(i);
+      // console.log(player);
+    }
 
     expect(true);
   });
